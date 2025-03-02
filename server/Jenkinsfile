@@ -1,1 +1,60 @@
 
+pipeline {
+    agent any
+
+    environment {
+        OCI_IMAGE = 'your-oci-repo/kbuddy-server:latest'
+        EC2_HOST = '43.201.18.4'
+        CONTAINER_NAME = 'kbuddy-server'
+    }
+  
+        stage('Deploy to EC2') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'OCI_AUTH_TOKEN', variable: 'OCI_TOKEN'),
+                    sshUserPrivateKey(credentialsId: 'EC2_SSH_KEY', keyFileVariable: 'SSH_KEY')
+                ]) {
+                    sh """
+                    ssh -i ${SSH_KEY} ubuntu@${EC2_HOST} << 'EOF'
+                    set -e
+                    docker login -u 'your-oci-user' -p ${OCI_TOKEN} your-oci-repo
+                    docker pull ${OCI_IMAGE}
+                    
+                    if [ \$(docker ps -q -f name=${CONTAINER_NAME}) ]; then
+                        docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}
+                    fi
+
+                    docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${OCI_IMAGE}
+                    EOF
+                    """
+                }
+            }
+        }
+        post {
+            success {
+                withCredentials([string(credentialsId: 'Discord-Webhook', variable: 'DISCORD')]) {
+                            discordSend description: """
+                            제목 : ${currentBuild.displayName}
+                            결과 : ${currentBuild.result}
+                            실행 시간 : ${currentBuild.duration / 1000}s
+                            """,
+                            link: env.BUILD_URL, result: currentBuild.currentResult, 
+                            title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공", 
+                            webhookURL: "$DISCORD"
+                }
+            }
+            failure {
+                withCredentials([string(credentialsId: 'Discord-Webhook', variable: 'DISCORD')]) {
+                            discordSend description: """
+                            제목 : ${currentBuild.displayName}
+                            결과 : ${currentBuild.result}
+                            실행 시간 : ${currentBuild.duration / 1000}s
+                            """,
+                            link: env.BUILD_URL, result: currentBuild.currentResult, 
+                            title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패", 
+                            webhookURL: "$DISCORD"
+                }
+            }
+        }
+    }
+}
