@@ -13,29 +13,38 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'OCI_AUTH_TOKEN', variable: 'OCI_TOKEN'),
-                    sshUserPrivateKey(credentialsId: 'EC2_SSH_KEY', keyFileVariable: 'SSH_KEY')
+                    string(credentialsId: 'OCI_AUTH_TOKEN', variable: 'OCI_TOKEN')
                 ]) {
                     script {
-                        sh """
-                        ssh -i ${SSH_KEY} ubuntu@${EC2_HOST} << 'EOF'
-                        set -e
-                        docker login -u ${OCI_USER} -p ${OCI_TOKEN} ${OCI_REPO}
-                        docker pull ${OCI_IMAGE}
+                        // Publish Over SSH를 사용한 SSH 연결 및 명령 실행
+                        sshPublisher(publishers: [
+                            sshPublisherDesc(
+                                name: 'EC2 Server', // Publish Over SSH 설정에서 지정한 이름
+                                transfers: [
+                                    sshTransfer(
+                                        sourceFiles: '', // 특별한 파일 전송이 없을 경우 비워두기
+                                        remoteDirectory: '/home/ubuntu', // 원격 디렉터리 (필요시 사용)
+                                        execCommand: """ 
+                                            set -e
+                                            docker login -u ${OCI_USER} -p ${OCI_TOKEN} ${OCI_REPO}
+                                            docker pull ${OCI_IMAGE}
 
-                        if [ \$(docker ps -q -f name=${CONTAINER_NAME}) ]; then
-                            docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}
-                        fi
+                                            if [ \$(docker ps -q -f name=${CONTAINER_NAME}) ]; then
+                                                docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}
+                                            fi
 
-                        docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${OCI_IMAGE}
-                        EOF
-                        """
+                                            docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${OCI_IMAGE}
+                                        """  // EC2에서 실행할 명령어
+                                    )
+                                ]
+                            )
+                        ])
                     }
                 }
             }
         }
     }
-    
+
     post {
         always {
             withCredentials([string(credentialsId: 'Discord-Webhook', variable: 'DISCORD')]) {
