@@ -19,7 +19,7 @@ pipeline {
                         // Publish Over SSH를 사용한 SSH 연결 및 명령 실행
                         sshPublisher(publishers: [
                             sshPublisherDesc(
-                                name: 'EC2 Server', // Publish Over SSH 설정에서 지정한 이름
+                                name: 'ubuntu', // Publish Over SSH 설정에서 지정한 이름
                                 transfers: [
                                     sshTransfer(
                                         sourceFiles: '', // 특별한 파일 전송이 없을 경우 비워두기
