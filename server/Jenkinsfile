@@ -6,6 +6,7 @@ pipeline {
         EC2_HOST = '43.201.18.4'
         CONTAINER_NAME = 'kbuddy-server'
         OCI_USER = 'dpfprtus@gmail.com'
+        OCI_REPO = 'axrlv6zrch9a/kbuddy-server'
     }
 
     stages {
@@ -19,7 +20,7 @@ pipeline {
                         sh """
                         ssh -i ${SSH_KEY} ubuntu@${EC2_HOST} << 'EOF'
                         set -e
-                        docker login -u ${OCI_USER} -p ${OCI_TOKEN} your-oci-repo
+                        docker login -u ${OCI_USER} -p ${OCI_TOKEN} ${OCI_REPO}
                         docker pull ${OCI_IMAGE}
 
                         if [ \$(docker ps -q -f name=${CONTAINER_NAME}) ]; then
