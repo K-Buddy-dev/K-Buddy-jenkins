@@ -32,7 +32,7 @@ pipeline {
                                             docker login ${OCI_REPO} -u ${OCI_USER} -p "${OCI_TOKEN}" 
                                             docker pull ${OCI_IMAGE}
 
-                                            if [ \$(docker ps -q -f name=${CONTAINER_NAME}) ]; then
+                                            if [ \$(docker ps -a -q -f name=${CONTAINER_NAME}) ]; then
                                                 docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}
                                             fi
 
