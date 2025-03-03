@@ -6,7 +6,7 @@ pipeline {
         EC2_HOST = '43.201.18.4'
         CONTAINER_NAME = 'kbuddy-server'
         OCI_USER = 'dpfprtus@gmail.com'
-        OCI_REPO = 'yny.ocir.io/axrlv6zrch9a/kbuddy-server'
+        OCI_REPO = 'axrlv6zrch9a/kbuddy-server'
     }
 
     stages {
@@ -17,9 +17,12 @@ pipeline {
                 ]) {
                     script {
                         // Publish Over SSH를 사용한 SSH 연결 및 명령 실행
-                        sshPublisher(publishers: [
+                        sshPublisher(
+                            failOnError: true,
+                            publishers: [
                             sshPublisherDesc(
                                 configName:'EC2 Server',
+                                verbose: true,
                                 transfers: [
                                     sshTransfer(
                                         sourceFiles: '', // 특별한 파일 전송이 없을 경우 비워두기
