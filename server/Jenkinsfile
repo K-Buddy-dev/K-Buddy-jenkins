@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        OCI_IMAGE = 'yny.ocir.io/axrlv6zrch9a/kbuddy-server:latest'
+        OCI_IMAGE = 'kbuddy-server:latest'
         EC2_HOST = '43.201.18.4'
         CONTAINER_NAME = 'kbuddy-server'
         OCI_USER = 'dpfprtus@gmail.com'
