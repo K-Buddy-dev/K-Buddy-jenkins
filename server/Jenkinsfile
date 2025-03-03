@@ -29,7 +29,7 @@ pipeline {
                                         remoteDirectory: '/home/ubuntu', // 원격 디렉터리 (필요시 사용)
                                         execCommand: """ 
                                             set -e
-                                            docker login -u ${OCI_USER} -password-stdin ${OCI_TOKEN} ${OCI_REPO}
+                                            docker login -u ${OCI_USER} --password-stdin ${OCI_TOKEN} ${OCI_REPO}
                                             docker pull ${OCI_IMAGE}
 
                                             if [ \$(docker ps -q -f name=${CONTAINER_NAME}) ]; then
