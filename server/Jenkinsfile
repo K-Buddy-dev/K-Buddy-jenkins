@@ -19,6 +19,7 @@ pipeline {
                         // Publish Over SSH를 사용한 SSH 연결 및 명령 실행
                         sshPublisher(publishers: [
                             sshPublisherDesc(
+                                configName:'EC2 Server'
                                 transfers: [
                                     sshTransfer(
                                         sourceFiles: '', // 특별한 파일 전송이 없을 경우 비워두기
