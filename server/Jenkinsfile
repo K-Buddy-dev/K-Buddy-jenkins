@@ -5,7 +5,7 @@ pipeline {
         OCI_IMAGE = 'kbuddy-server:latest'
         EC2_HOST = '43.201.18.4'
         CONTAINER_NAME = 'kbuddy-server'
-        OCI_USER = 'dpfprtus@gmail.com'
+        OCI_USER = 'kbuddy/dpfprtus@gmail.com'
         OCI_REPO = 'yny.ocir.io/axrlv6zrch9a/kbuddy-server'
     }
 
@@ -29,7 +29,7 @@ pipeline {
                                         remoteDirectory: '/home/ubuntu', // 원격 디렉터리 (필요시 사용)
                                         execCommand: """ 
                                             set -e
-                                            docker login -u ${OCI_USER} -p ${OCI_TOKEN} ${OCI_REPO}
+                                            docker login -u ${OCI_USER} -password-stdin ${OCI_TOKEN} ${OCI_REPO}
                                             docker pull ${OCI_IMAGE}
 
                                             if [ \$(docker ps -q -f name=${CONTAINER_NAME}) ]; then
