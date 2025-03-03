@@ -6,7 +6,7 @@ pipeline {
         EC2_HOST = '43.201.18.4'
         CONTAINER_NAME = 'kbuddy-server'
         OCI_USER = 'dpfprtus@gmail.com'
-        OCI_REPO = 'axrlv6zrch9a/kbuddy-server'
+        OCI_REPO = 'yny.ocir.io/axrlv6zrch9a/kbuddy-server'
     }
 
     stages {
