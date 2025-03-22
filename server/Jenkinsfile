@@ -30,13 +30,8 @@ pipeline {
                                         execCommand: """ 
                                             set -e
                                             docker login ${OCI_REPO} -u ${OCI_USER} -p "${OCI_TOKEN}" 
-                                            docker pull ${OCI_IMAGE}
-
-                                            if [ \$(docker ps -a -q -f name=${CONTAINER_NAME}) ]; then
-                                                docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}
-                                            fi
-
-                                            docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${OCI_IMAGE}
+                                            docker compose pull  # 최신 이미지 가져오기
+                                            docker compose up -d # 컨테이너 실행 (기존 네트워크 유지)
                                         """  // EC2에서 실행할 명령어
                                     )
                                 ]
